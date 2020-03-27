@@ -1,0 +1,40 @@
+version: '3.1'
+
+volumes:
+  db_data: {}
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: compose/backend/Dockerfile
+    env_file:
+      - .envs
+    command: gunicorn main:app -b 0.0.0.0:8080 -w 4 -k uvicorn.workers.UvicornWorker --reload
+    volumes:
+      - ./app:/app
+      - ./files:/files
+    secrets:
+      - rsa
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    env_file:
+      - .envs
+
+  nginx:
+    build:
+      context: .
+      dockerfile: compose/nginx/Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - backend
+
+secrets:
+  rsa:
+    file: ./.rsa

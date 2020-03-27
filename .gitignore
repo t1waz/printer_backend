@@ -1,0 +1,11 @@
+.venv
+
+.idea
+
+__pycache__/
+
+app/__pycache__/
+
+.envs
+
+files/*
